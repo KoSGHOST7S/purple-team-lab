@@ -81,6 +81,8 @@
 16. Tested connectivity with `curl -v` against both `localhost` and the VM's actual address
 17. Restarted Kibana again after the config fix
 
+![Initial Kibana dashboard](../screenshots/week-1/Screenshot%202026-07-28%20194419.png)
+
 **Problems hit:**
 - Kibana kept crash-looping (`Active: failed`, `Start request repeated too quickly`)
 - `journalctl` revealed the real error: `FATAL Error: listen EADDRNOTAVAIL` — Kibana's `server.host` in `kibana.yml` was set to an IP that didn't match the VM's actual assigned IP
