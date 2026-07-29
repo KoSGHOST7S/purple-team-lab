@@ -1,7 +1,6 @@
 # purple-team-lab
 
 ## Overview
-
 A SOC environment built over 4 weeks, covering:
 - How to draw a logical diagram
 - How to setup and configure ELK
@@ -9,8 +8,7 @@ A SOC environment built over 4 weeks, covering:
 - How to create alerts and dashboards
 
 ## Architecture
-
-![SOC architecture diagram](architecture/soc-diagram.png)
+![SOC architecture diagram](screenshots/week-1/SOC%20Diagram.drawio.svg)
 
 **Components (from the architecture diagram):**
 - SOC Analyst Laptop — connects to Elastic via web GUI
@@ -48,7 +46,6 @@ A SOC environment built over 4 weeks, covering:
 ## Troubleshooting notes
 
 Issues encountered and resolved while setting up Kibana:
-
 - **Kibana wouldn't start (`EADDRNOTAVAIL`)** — `kibana.yml` had `server.host` set to a specific IP that no longer matched the VM's actual DHCP-assigned IP. Fixed by setting `server.host: 0.0.0.0`.
 - **Couldn't reach Kibana remotely** — the cloud firewall's inbound Accept rule had its source set to a private LAN IP instead of the actual public IP making the request. Fixed by updating the rule's source to the correct public IP with a `/32` mask.
 - **Browser showed "Please upgrade your browser"** — caused by an outdated Firefox version failing Kibana's browser compatibility check. Confirmed `privacy.resistFingerprinting` was not the cause (it was `false`). Resolved by using Brave (Chromium-based) instead.
@@ -58,12 +55,13 @@ Issues encountered and resolved while setting up Kibana:
 ```
 purple-team-lab/
 ├── README.md
-├── architecture/
-│   └── soc-diagram.png
 ├── week1-elk-foundation/
+│   └── daily-log.md
 ├── week2-brute-force-detection/
 ├── week3-c2-and-attack-sim/
 ├── week4-ticketing-and-investigation/
 ├── detections/
 └── screenshots/
+    └── week-1/
+        └── SOC Diagram.drawio.svg
 ```
