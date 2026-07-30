@@ -157,3 +157,47 @@ Fleet Server acts as the central management point between Elastic Agents and Ela
 - Confirm Fleet now displays the updated hostname `SOC-WIN-larry` after reboot, and unenroll/re-enroll if the name doesn't refresh automatically
 - Verify Windows host is actively shipping logs/data into Elasticsearch via Fleet
 - Begin mapping Windows event/Sysmon data ingestion once the host is confirmed healthy in Fleet
+---
+
+## Day 4
+
+**Goal for today:**
+- Install Sysmon on the Windows host to enable detailed process/network/registry event logging for ingestion into Elastic
+
+**What I did:**
+1. Downloaded Sysmon from the official Sysinternals page:
+   https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
+2. Downloaded a community-maintained Sysmon configuration file (`sysmonconfig.xml`) from Olaf Hartong's `sysmon-modular` repo, which provides a much more comprehensive event-filtering ruleset than Sysmon's bare defaults:
+   https://github.com/olafhartong/sysmon-modular
+
+   ![Olaf sysmon-modular config](../screenshots/week-1/olaf_sysmonconfig.png)
+
+3. Extracted the Sysmon download into `C:\Users\Administrator\Downloads\Sysmon`, confirmed contents:
+```powershell
+   dir
+```
+   Files present: `Eula.txt`, `Sysmon.exe`, `Sysmon64.exe`, `Sysmon64a.exe`, `sysmonconfig.xml`
+4. Installed Sysmon using the downloaded config file, from an elevated PowerShell:
+```powershell
+   .\Sysmon64.exe -i sysmonconfig.xml
+```
+5. Confirmed successful install/start from the command output:
+```
+   Loading configuration file with schema version 4.90
+   Sysmon schema version: 4.91
+   Configuration file validated.
+   Sysmon64 installed.
+   SysmonDrv installed.
+   Starting SysmonDrv.
+   SysmonDrv started.
+   Starting Sysmon64..
+   Sysmon64 started.
+```
+6. Verified Sysmon was actively generating events by checking Event Viewer:
+   `Applications and Services Logs → Microsoft → Windows → Sysmon → Operational`
+
+   ![Sysmon events in Event Viewer](../screenshots/week-1/sysmonineventviwer.png)
+
+**Still open / next steps:**
+- Confirm Elastic Agent's Windows/Sysmon integration is picking up and shipping these events into Elasticsearch
+- Validate Sysmon events are visible/searchable in Kibana, then revisit the Sysmon App for Splunk exercises as a comparison point between the two SIEM stacks
