@@ -201,3 +201,37 @@ Fleet Server acts as the central management point between Elastic Agents and Ela
 **Still open / next steps:**
 - Confirm Elastic Agent's Windows/Sysmon integration is picking up and shipping these events into Elasticsearch
 - Validate Sysmon events are visible/searchable in Kibana, then revisit the Sysmon App for Splunk exercises as a comparison point between the two SIEM stacks
+## Day 5
+
+**Goal for today:**
+- Ingest Windows Sysmon logs into Elastic via the Custom Windows Event Logs integration, and add Microsoft Defender event collection through the same integration
+
+**What I did:**
+1. In Kibana, navigated to **Integrations → Add integration** and added the **Custom Windows Event Logs** integration to the agent policy for `SOC-WIN-larry`
+
+   ![Adding Sysmon to the integration](../screenshots/week-1/addingsysmontointegration.png)
+
+2. Selected **Logs** as the data stream type for the policy (as opposed to Metrics or Traces)
+3. Left the log channel name at its default for Sysmon, so events were pulled from the standard Sysmon Operational log
+4. Configured the integration's advanced settings:
+   - **Event ID**: comma-separated list of included/excluded event IDs (accepts single IDs like `4624`, ranges like `4700-4800`, or exclusions like `-4735`)
+   - **Ignore events older than**: `72h`, so the agent skips backfilling anything older than 3 days
+   - **Language ID**: left at `0` (system default / en-US)
+5. Added a second instance of the **Custom Windows Event Logs** integration (same policy), again leaving the log channel name at its default — this time for Microsoft Defender — and set the specific Defender event IDs I wanted collected: `1116, 1117, 5001`
+   - `1116` — Defender detected malware
+   - `1117` — Defender took action on a threat
+   - `5001` — Real-time protection was disabled
+
+   ![Adding event IDs with Defender](../screenshots/week-1/Addingeventidswithdefender.png)
+
+6. Saved and deployed the updated policy so Elastic Agent on the Windows host picked up both log sources
+7. Confirmed the agent applied the new policy:
+```powershell
+   Get-Service "Elastic Agent" | Select-Object Name, Status, StartType
+```
+8. Verified Sysmon and Defender events were both flowing into Elasticsearch by checking **Discover** in Kibana, filtered to each respective data stream
+
+**Still open / next steps:**
+- Build a Kibana dashboard combining Sysmon and Defender data for the Windows host
+- Compare Defender's native alerting (event IDs 1116/1117) against raw Sysmon events for the same malicious activity
+- Tune the Event ID filter lists further if noise becomes an issue
