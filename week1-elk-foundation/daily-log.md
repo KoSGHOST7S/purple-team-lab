@@ -235,3 +235,89 @@ Fleet Server acts as the central management point between Elastic Agents and Ela
 - Build a Kibana dashboard combining Sysmon and Defender data for the Windows host
 - Compare Defender's native alerting (event IDs 1116/1117) against raw Sysmon events for the same malicious activity
 - Tune the Event ID filter lists further if noise becomes an issue
+## Day 6
+
+**Goal for today:**
+- Enroll a second Linux host (`SOC-Linux-larry`) into Fleet as a standard agent, to broaden log collection beyond the Windows endpoint
+
+**What I did:**
+1. Confirmed system architecture before downloading the agent:
+   ```bash
+   uname -m
+   ```
+   Returned `x86_64`, confirming the correct Elastic Agent build to download in Kibana's "Add agent" flow
+2. Downloaded, extracted, and attempted to install/enroll the agent:
+   ```bash
+   curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-9.4.4-linux-x86_64.tar.gz
+   tar xzvf elastic-agent-9.4.4-linux-x86_64.tar.gz
+   cd elastic-agent-9.4.4-linux-x86_64
+   sudo ./elastic-agent install --url=https://64.177.122.71:8220 --enrollment-token=<token>
+   ```
+3. First enrollment attempt failed and retried repeatedly with:
+   ```
+   Error detected: fail to execute request to fleet-server: x509: certificate signed by unknown authority, will retry in a moment.
+   ```
+4. Suspended the stuck process with `Ctrl+Z` to investigate — this only suspends the job rather than killing it
+5. Re-ran the install with `--insecure` to bypass TLS verification against Fleet Server's self-signed cert:
+   ```bash
+   sudo ./elastic-agent install --url=https://64.177.122.71:8220 --enrollment-token=<token> --insecure
+   ```
+6. Hit `Error: already installed at: /opt/Elastic/Agent` — the suspended job from step 4 had already completed the install in the background
+7. Cleared the stuck job and cleanly reinstalled:
+   ```bash
+   jobs
+   kill -9 %1
+   sudo /opt/Elastic/Agent/elastic-agent uninstall
+   sudo ./elastic-agent install --url=https://64.177.122.71:8220 --enrollment-token=<token> --insecure
+   ```
+8. Agent enrolled successfully into Fleet:
+
+   ![Linux agent added to Fleet](../screenshots/week-1/addedlinuxagenttofleet.png)
+
+9. Agent showed **Degraded** health after enrolling:
+   ```
+   Recoverable: Elasticsearch request failed: dial tcp 216.128.156.245:9200: i/o timeout
+   ```
+10. Ruled out UFW as the cause — confirmed port 9200 already allowed inbound from anywhere on the Elasticsearch host:
+    ```bash
+    sudo ufw status verbose
+    ```
+11. Checked the Vultr cloud firewall group on the Elasticsearch host and found only three IPs allowed (each scoped `/32`) — none matched the Linux agent's own public IP
+12. Identified the Linux agent's public IP:
+    ```bash
+    curl ifconfig.me
+    ```
+    Returned `66.42.117.183` — not present in the Elasticsearch host's firewall group
+13. Added an Accept rule for `66.42.117.183/32` on TCP/9200 to the Elasticsearch host's Vultr firewall group
+14. Re-tested connectivity from the agent:
+    ```bash
+    curl -v -k https://216.128.156.245:9200
+    ```
+    Result: full TLS handshake succeeded against the self-signed `SOC-ELK` cert, and Elasticsearch responded with `HTTP/1.1 401 Unauthorized` — confirming the network path was open (401 is expected without credentials; the important part was getting a response instead of a timeout)
+15. Fleet briefly showed a transient **Unhealthy** state after the fix, but direct CLI status on the host confirmed everything was actually healthy:
+    ```bash
+    sudo /opt/Elastic/Agent/elastic-agent status --output=full
+    ```
+    All inputs and outputs (fleet, filestream-monitoring, log-default, system/metrics-default) reported `HEALTHY`
+16. Refreshed the Fleet Agents page, which then correctly displayed `SOC-Linux-larry` as **Healthy**
+17. Confirmed all three hosts (`SOC-ELK`, `SOC-WIN-larry`, `SOC-Linux-larry`) were actively sending logs into the Elastic stack:
+
+    ![Kibana dashboard showing three hosts sending logs](../screenshots/week-1/elasticdashboardshowingweaddedthreeservers.png)
+
+**Problems hit:**
+- `x509: certificate signed by unknown authority` — Fleet Server uses a self-signed cert, which the agent doesn't trust by default
+- `Ctrl+Z` suspended rather than killed the enrollment process, leaving a background install that blocked the next attempt with `Error: already installed`
+- Agent enrolled but reported `Degraded`/`i/o timeout` reaching Elasticsearch on port 9200 — turned out to be the Vultr cloud firewall group missing an inbound rule for the Linux agent's specific public IP (UFW and Elasticsearch's own binding were both already correct)
+- Fleet's UI briefly showed `Unhealthy` even after the fix — a stale status snapshot that cleared once the agent completed another check-in cycle
+
+**How I solved them:**
+- Used `--insecure` on the install command to bypass cert validation for this lab environment (in production, would use `--certificate-authorities` or a CA fingerprint instead, as done for the Windows Fleet Server enrollment on Day 3)
+- Killed the suspended background job with `kill -9 %1`, then cleanly uninstalled via `/opt/Elastic/Agent/elastic-agent uninstall` before reinstalling
+- Diagnosed the timeout methodically: ruled out UFW first (already open), then found and fixed the actual cause — the agent's own public IP (`66.42.117.183/32`) was missing from the Elasticsearch host's Vultr firewall group
+- Confirmed the fix using a manual `curl` test (TLS handshake + 401 response, instead of a timeout) before trusting Fleet's own status indicator, then cross-checked with `elastic-agent status --output=full` directly on the host to bypass a temporarily stale Fleet UI reading
+
+**Still open / next steps:**
+- Decide what integrations/log sources to add for this Linux host, now that it's confirmed healthy (currently only running the base System integration)
+- Consider standardizing on `--certificate-authorities`/CA fingerprint instead of `--insecure` across agents, for consistency with the Windows Fleet Server setup
+- Build a Kibana dashboard incorporating this Linux host alongside the existing Windows/Sysmon/Defender data
+- Look into scoping the Vultr firewall's port 9200 rule down to just port 9200 (not a full `1:65535` range) for tighter security, and consider narrowing the existing 5601 rule the same way
