@@ -321,3 +321,51 @@ Fleet Server acts as the central management point between Elastic Agents and Ela
 - Consider standardizing on `--certificate-authorities`/CA fingerprint instead of `--insecure` across agents, for consistency with the Windows Fleet Server setup
 - Build a Kibana dashboard incorporating this Linux host alongside the existing Windows/Sysmon/Defender data
 - Look into scoping the Vultr firewall's port 9200 rule down to just port 9200 (not a full `1:65535` range) for tighter security, and consider narrowing the existing 5601 rule the same way
+## Day 7
+
+**Goal for today:**
+- Build a Kibana query to detect SSH brute-force activity, turn it into an alert rule, and visualize the failed/successful attempts on a dashboard using Maps
+
+**What I did:**
+1. Went into **Discover**, selected the relevant data view, and built the initial query to isolate SSH activity:
+   ```
+   system.auth.ssh.event : *
+   ```
+   Reviewed the results — noticed a large volume of `Failed` events hitting many different usernames (`root`, `dev`, `test`, `ubuntu`, etc.) from a small handful of source IPs in short bursts, most heavily from `45.153.34.41` (Netherlands).
+
+   ![Initial query for making the rule](../screenshots/week-2/created_initquery_for_makingrule.png)
+
+2. Narrowed the query to only failed authentications and used **Create rule → Elasticsearch query** from Discover to build an alert off of it:
+   ```
+   system.auth.ssh.event : "Failed"
+   ```
+3. Configured the rule's grouping/threshold to catch brute-force behavior instead of alerting on every single failed login:
+   - **Group by**: `source.ip`
+   - **Threshold**: alert when a group exceeds a set number of matching documents (tuned this against the volume seen from `45.153.34.41`)
+   - **Time window**: a short rolling window (few minutes) so the rule reacts to bursts, not scattered one-off failures
+   - Left **"Exclude matches from previous runs"** enabled so the same failed-login burst doesn't re-trigger the rule on every scheduled run
+4. Set the **rule schedule** to check on a short interval so bursts get caught quickly without over-hammering Elasticsearch
+5. Saved the rule — confirmed it correctly picked out the `45.153.34.41` brute-force pattern rather than firing on isolated failed logins
+
+   ![Created SSH brute-force rule](../screenshots/week-2/createdsshbruteforcerule.png)
+
+6. Built a **dashboard** with two Maps panels side by side — one for **SSH Failed Authentications** and one for **SSH Success** — each showing a choropleth of attempt volume by country (`source.geo.country_iso_code`), with a shared `source.geo.country_iso_code: US` filter applied at the dashboard level
+
+   ![Dashboard of failed and success SSH](../screenshots/week-2/madeadashboardof_failedandsuccess_ssh.png)
+
+7. Used the brute-force query data to populate the map layer and confirm the geographic spread of the attack traffic
+
+   ![Using brute-force data on the map](../screenshots/week-2/usingbruteforcedataonmap.png)
+
+**Problems hit:**
+- Initially couldn't edit the query on the second map panel (SSH Success) — turned out both panels were pointing at the same underlying saved Maps object rather than two independent visualizations, so editing one affected both
+- Had to be careful that the panel-level query (`Failed` vs `Accepted`/success value) was actually being set on the correct, independent saved object rather than a shared one
+
+**How I solved them:**
+- Went into the Maps editor for the linked panel and saved it as a new, separate visualization (rather than saving back to the shared object), then re-pointed the dashboard panel at the new one
+- Set the layer query explicitly per map afterward: `system.auth.ssh.event : "Failed"` on one, the success equivalent on the other, so each panel now reflects independent data
+
+**Still open / next steps:**
+- Confirm the alert rule fires correctly against live traffic (not just backtested against existing documents) and wire up an action (e.g. webhook/email) so the alert actually notifies someone
+- Tune the threshold/time window further if false positives or missed bursts show up over the next few days
+- Consider adding a `user.name` grouping in addition to `source.ip` to catch spray-style attacks that rotate IPs but reuse a small set of usernames
