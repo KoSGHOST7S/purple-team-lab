@@ -369,3 +369,82 @@ Fleet Server acts as the central management point between Elastic Agents and Ela
 - Confirm the alert rule fires correctly against live traffic (not just backtested against existing documents) and wire up an action (e.g. webhook/email) so the alert actually notifies someone
 - Tune the threshold/time window further if false positives or missed bursts show up over the next few days
 - Consider adding a `user.name` grouping in addition to `source.ip` to catch spray-style attacks that rotate IPs but reuse a small set of usernames
+## Day 8
+
+**Goal for today:**
+- Build a query to detect failed RDP logon attempts on Windows, turn it into an alert rule, and (if time allows) visualize the failed/successful attempts on a dashboard
+
+**Relevant Windows event:**
+- **Event ID 4625** — An account failed to log on
+- **Logon Type 10** — RemoteInteractive (RDP)
+
+**What I did:**
+
+1. **Set up an RDP client to generate test traffic**
+   - Installed FreeRDP on Omarchy: `sudo pacman -S freerdp`
+   - Package installs as `xfreerdp3` (not `xfreerdp` — FreeRDP 3.x uses versioned binary names). Symlinked it for convenience: `sudo ln -s /usr/bin/xfreerdp3 /usr/bin/xfreerdp`
+   - Connected to the Windows target to generate failed logon attempts:
+     ```
+     xfreerdp3 /v:<target-ip> /u:<username> /p:<password> /cert:ignore
+     ```
+   - If the connection doesn't complete cleanly, force security mode explicitly with `/sec:nla` or `/sec:rdp`.
+
+2. **Explored the alert rule build in Kibana → Stack Management → Rules**
+   - Used the **Custom Threshold** rule type (`observability.rules.custom_threshold`) as a reference, based on the existing SSH bruteforce rule structure:
+     - Data view: needs to point at the index actually containing the Windows RDP logs (double-check this isn't left on a default)
+     - Query filter (SSH reference pulled for format):
+       ```
+       system.auth.ssh.event: * and agent.name: "SOC-Linux-larry" and system.auth.ssh.event: "Failed"
+       ```
+     - RDP equivalent to adapt:
+       ```
+       event.code: "4625" and winlog.logon.type: 10 and agent.name: "<windows-hostname>"
+       ```
+     - Still need to fill in: Aggregation A (e.g. Count), Equation and threshold (e.g. `A > 5`), Group alerts by `source.ip`, rule schedule interval, alert delay (consecutive matches)
+
+3. **Planned the Kibana dashboard for RDP failed attempts**
+   - Panels planned in Lens:
+     - Failed logons over time (date histogram on `@timestamp`, filtered to `event.code:4625 and winlog.logon.type:10`)
+     - Top source IPs (breakdown by `source.ip`)
+     - Top targeted usernames (breakdown by `user.name`)
+     - Failed vs. successful RDP comparison (`event.code:4625` vs `event.code:4624 and winlog.logon.type:10`)
+   - Map layer (same approach as Day 7's SSH map) — needs `source.geo.location` populated via GeoIP enrichment; still need to confirm this is set up for the Windows/RDP data source specifically
+   - Not yet assembled into a saved dashboard
+
+4. **Created the RDP alert rules in Stack Management → Rules**
+   - Confirmed live in the Rules list (Aug 4, 2026):
+     - **MySOC-RDP Bruteforce Activity** — Elasticsearch query rule type, 1 min check interval, currently active (alert bell showing)
+     - **MySOC-RDP-Brute-Force-Attempt** — Custom threshold rule type, 1 min check interval, currently active
+   - Both are alongside the existing **MySOC-Linux-Larry-Bruteforce-SSH** (Custom threshold) and **MySOC-SSH-Brute-Force-Activity** (Elasticsearch query) rules from Day 7 — so now have both rule types covering both SSH and RDP
+   - Note: built two separate RDP rules (one Elasticsearch query, one Custom threshold) rather than just one — worth deciding later whether to keep both or consolidate
+
+   ![Added custom rules for RDP brute force](../screenshots/week-2/addedcustomeventsforbruteforce.png)
+
+5. **Built table visualizations and added them to the dashboard**
+   - Working dashboard: **MySOC-Authentication-Activity**
+   - Added panel: **RDP Failed Activity [Table]**
+     - Columns: `@timestamp` (per 3 hours), top 10 `source.ip`, top 10 `source.geo.country_iso_code`, top 10 `user.name`, count of records
+     - Real data populating already — e.g. `173.201.45.113` and `98.187.161.247` hitting `ADMINISTRATOR`/`PUBLIC`/`Administrator` accounts, up to 12 attempts in a single 3-hour bucket
+     - Confirms GeoIP enrichment **is** working for the RDP/Windows data source (country_iso_code populating correctly)
+   - Added panel: **RDP Success Authentications [Table]** — currently showing **"No results found"**
+   - Existing SSH table panel (filtered to `source.geo.country_iso_code: US`) still on the dashboard showing brute-force data from `146.190.154.100` and `43.130.90.166` (root/rehua/ubuntu/admin/user) — reused from Day 7
+
+   ![Added table visualizations to the dashboard](../screenshots/week-2/addedtablesindashboard.png)
+
+**Problems hit:**
+- FreeRDP's package name (`freerdp`) doesn't match its binary name — installs as `xfreerdp3`, not `xfreerdp`, so following older guides/muscle memory for the plain `xfreerdp` command fails with `command not found`
+- Ended up building two separate RDP alert rules (one Elasticsearch query, one Custom threshold) rather than a single one
+- **RDP Success Authentications** table panel is returning "No results found"
+
+**How I solved them:**
+- Symlinked `xfreerdp3` to `xfreerdp` (`sudo ln -s /usr/bin/xfreerdp3 /usr/bin/xfreerdp`) for convenience going forward
+- Left both RDP rules active for now rather than picking one — revisit later whether to consolidate or disable one to avoid duplicate alerting
+- Not yet resolved — still need to confirm whether the empty success-auth panel is because no successful RDP test logon has been performed yet in the lab, or the query/field mapping needs adjusting
+
+**Still open / next steps:**
+- Fill in the Custom Threshold rule's Aggregation/Equation/threshold values (Count, e.g. `A > 5`) and confirm Group by `source.ip` is set
+- Perform a successful RDP test logon to confirm the Success Authentications panel populates correctly
+- Add the Maps panel for RDP (mirroring Day 7's SSH map) once GeoIP is confirmed fully wired up for this data source
+- Wire up an action (webhook/email) on the RDP rules so they actually notify, same open item carried over from Day 7's SSH rule
+
+---
