@@ -1,0 +1,241 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1240" width="900" height="1240" font-family="Arial, sans-serif">
+<defs>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L0,6 L9,3 z" fill="#7f8c8d"/>
+  </marker>
+</defs>
+<rect x="0" y="0" width="900" height="1240" fill="#ffffff"/>
+<text x="450.0" y="26" text-anchor="middle" font-size="22" font-weight="800" fill="#1a1a1a" font-family="Arial, sans-serif">Attack Chain: RDP Bruteforce → Mythic C2</text>
+<text x="450.0" y="46" text-anchor="middle" font-size="12" fill="#7f8c8d" font-family="Arial, sans-serif">Attacker (red) · Compromised Windows hosts · Mythic C2 infrastructure (red)</text>
+<g transform="translate(0,60)">
+<line x1="40" y1="30" x2="860" y2="30" stroke="#d5d8dc" stroke-width="1"/>
+<text x="450.0" y="54" text-anchor="middle" font-size="16" font-weight="800" fill="#1a1a1a" font-family="Arial, sans-serif" letter-spacing="0.5">Phase 1 — Initial Access</text>
+<rect x="104" y="72" width="52" height="38" rx="3" fill="#2c2c2c"/>
+<rect x="108" y="76" width="44" height="30" rx="2" fill="#f5b7b1"/>
+<path d="M 90 120 L 106 112 L 154 112 L 170 120 L 170 128 L 90 128 Z" fill="#c0392b"/>
+<rect x="86" y="126" width="88" height="5" rx="2" fill="#c0392b"/>
+<text x="130.0" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" font-family="Arial, sans-serif">Attacker</text>
+<g>
+    <ellipse cx="394.0" cy="106.0" rx="16" ry="13" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="424.0" cy="106.0" rx="18" ry="15" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="410.0" cy="96.0" rx="20" ry="16" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <rect x="375" y="102.0" width="70" height="14" fill="#aed6f1"/>
+    </g>
+<rect x="650" y="72" width="60" height="60" rx="4" fill="#3b5978" stroke="#1c2833" stroke-width="1.5"/>
+<rect x="656" y="79" width="48" height="10" rx="1.5" fill="#1c2833" opacity="0.55"/>
+<circle cx="698" cy="84" r="1.8" fill="#58d68d"/>
+<rect x="656" y="96" width="48" height="10" rx="1.5" fill="#1c2833" opacity="0.55"/>
+<circle cx="698" cy="101" r="1.8" fill="#58d68d"/>
+<rect x="656" y="113" width="48" height="10" rx="1.5" fill="#1c2833" opacity="0.55"/>
+<circle cx="698" cy="118" r="1.8" fill="#58d68d"/>
+<text x="680.0" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="#2c3e50" font-family="Arial, sans-serif">Windows Server</text>
+<line x1="170" y1="102.0" x2="375" y2="102.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="216.1" y="81.0" width="112.8" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="272.5" y="94.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">RDP Bruteforce</text>
+<line x1="445" y1="102.0" x2="640" y2="102.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="104" y="162" width="52" height="38" rx="3" fill="#2c2c2c"/>
+<rect x="108" y="166" width="44" height="30" rx="2" fill="#f5b7b1"/>
+<path d="M 90 210 L 106 202 L 154 202 L 170 210 L 170 218 L 90 218 Z" fill="#c0392b"/>
+<rect x="86" y="216" width="88" height="5" rx="2" fill="#c0392b"/>
+<text x="130.0" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" font-family="Arial, sans-serif">Attacker</text>
+<g>
+    <ellipse cx="394.0" cy="196.0" rx="16" ry="13" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="424.0" cy="196.0" rx="18" ry="15" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="410.0" cy="186.0" rx="20" ry="16" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <rect x="375" y="192.0" width="70" height="14" fill="#aed6f1"/>
+    </g>
+<rect x="650" y="162" width="60" height="60" rx="4" fill="#3b5978" stroke="#1c2833" stroke-width="1.5"/>
+<rect x="656" y="169" width="48" height="10" rx="1.5" fill="#1c2833" opacity="0.55"/>
+<circle cx="698" cy="174" r="1.8" fill="#58d68d"/>
+<rect x="656" y="186" width="48" height="10" rx="1.5" fill="#1c2833" opacity="0.55"/>
+<circle cx="698" cy="191" r="1.8" fill="#58d68d"/>
+<rect x="656" y="203" width="48" height="10" rx="1.5" fill="#1c2833" opacity="0.55"/>
+<circle cx="698" cy="208" r="1.8" fill="#58d68d"/>
+<text x="680.0" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#2c3e50" font-family="Arial, sans-serif">Windows Server</text>
+<line x1="170" y1="192.0" x2="375" y2="192.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="176.5" y="171.0" width="192.0" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="272.5" y="184.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Successful Authentication</text>
+<line x1="445" y1="192.0" x2="640" y2="192.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="40" y1="252" x2="860" y2="252" stroke="#d5d8dc" stroke-width="1"/>
+<text x="450.0" y="276" text-anchor="middle" font-size="16" font-weight="800" fill="#1a1a1a" font-family="Arial, sans-serif" letter-spacing="0.5">Phase 2 — Discovery</text>
+<rect x="104" y="294" width="52" height="38" rx="3" fill="#2c2c2c"/>
+<rect x="108" y="298" width="44" height="30" rx="2" fill="#f5b7b1"/>
+<path d="M 90 342 L 106 334 L 154 334 L 170 342 L 170 350 L 90 350 Z" fill="#c0392b"/>
+<rect x="86" y="348" width="88" height="5" rx="2" fill="#c0392b"/>
+<text x="130.0" y="372" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" font-family="Arial, sans-serif">Attacker</text>
+<g>
+    <ellipse cx="394.0" cy="328.0" rx="16" ry="13" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="424.0" cy="328.0" rx="18" ry="15" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="410.0" cy="318.0" rx="20" ry="16" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <rect x="375" y="324.0" width="70" height="14" fill="#aed6f1"/>
+    </g>
+<rect x="650" y="294" width="60" height="60" rx="4" fill="#3b5978" stroke="#1c2833" stroke-width="1.5"/>
+<rect x="656" y="301" width="48" height="10" rx="1.5" fill="#1c2833" opacity="0.55"/>
+<circle cx="698" cy="306" r="1.8" fill="#58d68d"/>
+<rect x="656" y="318" width="48" height="10" rx="1.5" fill="#1c2833" opacity="0.55"/>
+<circle cx="698" cy="323" r="1.8" fill="#58d68d"/>
+<rect x="656" y="335" width="48" height="10" rx="1.5" fill="#1c2833" opacity="0.55"/>
+<circle cx="698" cy="340" r="1.8" fill="#58d68d"/>
+<text x="680.0" y="372" text-anchor="middle" font-size="12" font-weight="700" fill="#2c3e50" font-family="Arial, sans-serif">Windows Server</text>
+<line x1="170" y1="324.0" x2="375" y2="324.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="205.3" y="303.0" width="134.4" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="272.5" y="316.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Discovery via RDP</text>
+<line x1="445" y1="324.0" x2="640" y2="324.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="450.0" y="384" text-anchor="middle" font-size="12.5" fill="#555555" font-style="italic" font-family="Arial, sans-serif">whoami   •   ipconfig   •   net user   •   net group</text>
+<line x1="40" y1="418" x2="860" y2="418" stroke="#d5d8dc" stroke-width="1"/>
+<text x="450.0" y="442" text-anchor="middle" font-size="16" font-weight="800" fill="#1a1a1a" font-family="Arial, sans-serif" letter-spacing="0.5">Phase 3 — Defense Evasion</text>
+<rect x="104" y="460" width="52" height="38" rx="3" fill="#2c2c2c"/>
+<rect x="108" y="464" width="44" height="30" rx="2" fill="#f5b7b1"/>
+<path d="M 90 508 L 106 500 L 154 500 L 170 508 L 170 516 L 90 516 Z" fill="#c0392b"/>
+<rect x="86" y="514" width="88" height="5" rx="2" fill="#c0392b"/>
+<text x="130.0" y="538" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" font-family="Arial, sans-serif">Attacker</text>
+<g>
+    <ellipse cx="394.0" cy="494.0" rx="16" ry="13" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="424.0" cy="494.0" rx="18" ry="15" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="410.0" cy="484.0" rx="20" ry="16" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <rect x="375" y="490.0" width="70" height="14" fill="#aed6f1"/>
+    </g>
+<rect x="650" y="460" width="60" height="60" rx="4" fill="#c0392b" stroke="#7b241c" stroke-width="1.5"/>
+<rect x="656" y="467" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="472" r="1.8" fill="#58d68d"/>
+<rect x="656" y="484" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="489" r="1.8" fill="#58d68d"/>
+<rect x="656" y="501" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="506" r="1.8" fill="#58d68d"/>
+<text x="680.0" y="538" text-anchor="middle" font-size="12" font-weight="700" fill="#c0392b" font-family="Arial, sans-serif">Mythic C2</text>
+<line x1="170" y1="490.0" x2="375" y2="490.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="255.7" y="469.0" width="33.6" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="272.5" y="482.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">RDP</text>
+<line x1="445" y1="490.0" x2="640" y2="490.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="478.9" y="469.0" width="127.2" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="542.5" y="482.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Disable Defender</text>
+<line x1="40" y1="550" x2="860" y2="550" stroke="#d5d8dc" stroke-width="1"/>
+<text x="450.0" y="574" text-anchor="middle" font-size="16" font-weight="800" fill="#1a1a1a" font-family="Arial, sans-serif" letter-spacing="0.5">Phase 4 — Execution</text>
+<rect x="104" y="592" width="52" height="38" rx="3" fill="#2c2c2c"/>
+<rect x="108" y="596" width="44" height="30" rx="2" fill="#f5b7b1"/>
+<path d="M 90 640 L 106 632 L 154 632 L 170 640 L 170 648 L 90 648 Z" fill="#c0392b"/>
+<rect x="86" y="646" width="88" height="5" rx="2" fill="#c0392b"/>
+<text x="130.0" y="670" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" font-family="Arial, sans-serif">Attacker</text>
+<g>
+    <ellipse cx="394.0" cy="626.0" rx="16" ry="13" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="424.0" cy="626.0" rx="18" ry="15" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="410.0" cy="616.0" rx="20" ry="16" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <rect x="375" y="622.0" width="70" height="14" fill="#aed6f1"/>
+    </g>
+<rect x="650" y="592" width="60" height="60" rx="4" fill="#c0392b" stroke="#7b241c" stroke-width="1.5"/>
+<rect x="656" y="599" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="604" r="1.8" fill="#58d68d"/>
+<rect x="656" y="616" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="621" r="1.8" fill="#58d68d"/>
+<rect x="656" y="633" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="638" r="1.8" fill="#58d68d"/>
+<text x="680.0" y="670" text-anchor="middle" font-size="12" font-weight="700" fill="#c0392b" font-family="Arial, sans-serif">Mythic C2</text>
+<line x1="170" y1="622.0" x2="375" y2="622.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="216.1" y="601.0" width="112.8" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="272.5" y="614.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Powershell IEX</text>
+<line x1="445" y1="622.0" x2="640" y2="622.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="493.3" y="601.0" width="98.4" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="542.5" y="614.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Mythic Agent</text>
+<rect x="650" y="682" width="60" height="60" rx="4" fill="#c0392b" stroke="#7b241c" stroke-width="1.5"/>
+<rect x="656" y="689" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="694" r="1.8" fill="#58d68d"/>
+<rect x="656" y="706" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="711" r="1.8" fill="#58d68d"/>
+<rect x="656" y="723" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="728" r="1.8" fill="#58d68d"/>
+<text x="680.0" y="760" text-anchor="middle" font-size="12" font-weight="700" fill="#c0392b" font-family="Arial, sans-serif">Mythic C2</text>
+<g>
+    <ellipse cx="394.0" cy="716.0" rx="16" ry="13" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="424.0" cy="716.0" rx="18" ry="15" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="410.0" cy="706.0" rx="20" ry="16" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <rect x="375" y="712.0" width="70" height="14" fill="#aed6f1"/>
+    </g>
+<rect x="104" y="682" width="52" height="38" rx="3" fill="#2c2c2c"/>
+<rect x="108" y="686" width="44" height="30" rx="2" fill="#f5b7b1"/>
+<path d="M 90 730 L 106 722 L 154 722 L 170 730 L 170 738 L 90 738 Z" fill="#c0392b"/>
+<rect x="86" y="736" width="88" height="5" rx="2" fill="#c0392b"/>
+<text x="130.0" y="760" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" font-family="Arial, sans-serif">Attacker</text>
+<line x1="640" y1="712.0" x2="445" y2="712.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="493.3" y="691.0" width="98.4" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="542.5" y="704.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Mythic Agent</text>
+<line x1="375" y1="712.0" x2="170" y2="712.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="216.1" y="691.0" width="112.8" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="272.5" y="704.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Powershell IEX</text>
+<line x1="40" y1="772" x2="860" y2="772" stroke="#d5d8dc" stroke-width="1"/>
+<text x="450.0" y="796" text-anchor="middle" font-size="16" font-weight="800" fill="#1a1a1a" font-family="Arial, sans-serif" letter-spacing="0.5">Phase 5 — Command and Control</text>
+<rect x="104" y="814" width="52" height="38" rx="3" fill="#2c2c2c"/>
+<rect x="108" y="818" width="44" height="30" rx="2" fill="#f5b7b1"/>
+<path d="M 90 862 L 106 854 L 154 854 L 170 862 L 170 870 L 90 870 Z" fill="#c0392b"/>
+<rect x="86" y="868" width="88" height="5" rx="2" fill="#c0392b"/>
+<text x="130.0" y="892" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" font-family="Arial, sans-serif">Attacker</text>
+<g>
+    <ellipse cx="394.0" cy="848.0" rx="16" ry="13" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="424.0" cy="848.0" rx="18" ry="15" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="410.0" cy="838.0" rx="20" ry="16" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <rect x="375" y="844.0" width="70" height="14" fill="#aed6f1"/>
+    </g>
+<rect x="650" y="814" width="60" height="60" rx="4" fill="#c0392b" stroke="#7b241c" stroke-width="1.5"/>
+<rect x="656" y="821" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="826" r="1.8" fill="#58d68d"/>
+<rect x="656" y="838" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="843" r="1.8" fill="#58d68d"/>
+<rect x="656" y="855" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="860" r="1.8" fill="#58d68d"/>
+<text x="680.0" y="892" text-anchor="middle" font-size="12" font-weight="700" fill="#c0392b" font-family="Arial, sans-serif">Mythic C2</text>
+<line x1="170" y1="844.0" x2="375" y2="844.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="216.1" y="823.0" width="112.8" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="272.5" y="836.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Powershell IEX</text>
+<line x1="445" y1="844.0" x2="640" y2="844.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="493.3" y="823.0" width="98.4" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="542.5" y="836.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Mythic Agent</text>
+<rect x="104" y="904" width="52" height="38" rx="3" fill="#2c2c2c"/>
+<rect x="108" y="908" width="44" height="30" rx="2" fill="#f5b7b1"/>
+<path d="M 90 952 L 106 944 L 154 944 L 170 952 L 170 960 L 90 960 Z" fill="#c0392b"/>
+<rect x="86" y="958" width="88" height="5" rx="2" fill="#c0392b"/>
+<text x="130.0" y="982" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" font-family="Arial, sans-serif">Attacker</text>
+<g>
+    <ellipse cx="394.0" cy="938.0" rx="16" ry="13" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="424.0" cy="938.0" rx="18" ry="15" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="410.0" cy="928.0" rx="20" ry="16" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <rect x="375" y="934.0" width="70" height="14" fill="#aed6f1"/>
+    </g>
+<rect x="650" y="904" width="60" height="60" rx="4" fill="#c0392b" stroke="#7b241c" stroke-width="1.5"/>
+<rect x="656" y="911" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="916" r="1.8" fill="#58d68d"/>
+<rect x="656" y="928" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="933" r="1.8" fill="#58d68d"/>
+<rect x="656" y="945" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="950" r="1.8" fill="#58d68d"/>
+<text x="680.0" y="982" text-anchor="middle" font-size="12" font-weight="700" fill="#c0392b" font-family="Arial, sans-serif">Mythic C2</text>
+<line x1="170" y1="934.0" x2="375" y2="934.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="223.3" y="913.0" width="98.4" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="272.5" y="926.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Establish C2</text>
+<line x1="445" y1="934.0" x2="640" y2="934.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="450.0" y="994" text-anchor="middle" font-size="12.5" fill="#555555" font-style="italic" font-family="Arial, sans-serif">Create fake password file called passwords.txt</text>
+<line x1="40" y1="1028" x2="860" y2="1028" stroke="#d5d8dc" stroke-width="1"/>
+<text x="450.0" y="1052" text-anchor="middle" font-size="16" font-weight="800" fill="#1a1a1a" font-family="Arial, sans-serif" letter-spacing="0.5">Phase 6 — Exfiltration</text>
+<rect x="650" y="1070" width="60" height="60" rx="4" fill="#c0392b" stroke="#7b241c" stroke-width="1.5"/>
+<rect x="656" y="1077" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="1082" r="1.8" fill="#58d68d"/>
+<rect x="656" y="1094" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="1099" r="1.8" fill="#58d68d"/>
+<rect x="656" y="1111" width="48" height="10" rx="1.5" fill="#7b241c" opacity="0.55"/>
+<circle cx="698" cy="1116" r="1.8" fill="#58d68d"/>
+<text x="680.0" y="1148" text-anchor="middle" font-size="12" font-weight="700" fill="#c0392b" font-family="Arial, sans-serif">Mythic C2</text>
+<g>
+    <ellipse cx="394.0" cy="1104.0" rx="16" ry="13" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="424.0" cy="1104.0" rx="18" ry="15" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <ellipse cx="410.0" cy="1094.0" rx="20" ry="16" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+    <rect x="375" y="1100.0" width="70" height="14" fill="#aed6f1"/>
+    </g>
+<rect x="104" y="1070" width="52" height="38" rx="3" fill="#2c2c2c"/>
+<rect x="108" y="1074" width="44" height="30" rx="2" fill="#f5b7b1"/>
+<path d="M 90 1118 L 106 1110 L 154 1110 L 170 1118 L 170 1126 L 90 1126 Z" fill="#c0392b"/>
+<rect x="86" y="1124" width="88" height="5" rx="2" fill="#c0392b"/>
+<text x="130.0" y="1148" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" font-family="Arial, sans-serif">Attacker</text>
+<line x1="640" y1="1100.0" x2="445" y2="1100.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="457.3" y="1079.0" width="170.4" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="542.5" y="1092.0" text-anchor="middle" font-size="12" fill="#333333" font-family="Arial, sans-serif">Download passwords.txt</text>
+<line x1="375" y1="1100.0" x2="170" y2="1100.0" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+</g>
+</svg>
