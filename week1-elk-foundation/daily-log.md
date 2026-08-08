@@ -447,4 +447,58 @@ Fleet Server acts as the central management point between Elastic Agents and Ela
 - Add the Maps panel for RDP (mirroring Day 7's SSH map) once GeoIP is confirmed fully wired up for this data source
 - Wire up an action (webhook/email) on the RDP rules so they actually notify, same open item carried over from Day 7's SSH rule
 
+## Day 9
+
+**Goal for today:**
+- Stand up a dedicated Ubuntu server for Mythic C2, get it installed via Docker Compose, and lock down access so only a trusted host can reach it
+
+**What I did:**
+1. Provisioned a fresh Ubuntu server to serve as the dedicated Mythic C2 host (kept separate from the existing Elastic stack and from the Kali attack VM, for compartmentalization)
+2. Cloned the Mythic repository from GitHub:
+   ```bash
+   git clone https://github.com/its-a-feature/Mythic
+   cd Mythic
+   ```
+3. Ran the provided install shell script to pull in Docker and Docker Compose dependencies:
+   ```bash
+   ./install_docker_ubuntu.sh
+   ```
+   Installed `apt-transport-https` and `gnupg-agent` as new packages; `ca-certificates`, `curl`, and `software-properties-common` were already present
+4. Ran `make` in the Mythic directory to build out the project
+5. Attempted to start Docker/Mythic — `docker.service` failed to start (`systemctl restart docker` → exit code 1)
+6. Pulled the real error from `journalctl -xeu docker.service`:
+   ```
+   failed to load listeners: no sockets found via socket activation: make sure the service was started by systemd
+   ```
+   Caused by the default `ExecStart=... -H fd://` directive expecting `docker.socket` to hand off a listening socket via systemd socket activation, which wasn't happening cleanly
+7. Started Mythic with the CLI once Docker was healthy:
+   ```bash
+   sudo ./mythic-cli start
+   ```
+8. Confirmed containers came up healthy (`mythic_server`, `mythic_react`, RabbitMQ, etc.) via `mythic-cli status` / `docker ps`
+9. Created firewall rules to restrict access to the Mythic C2 from a trusted environment only, rather than leaving it open to the internet — same approach used for the Elastic stack (scoped `/32` rules rather than a broad CIDR range)
+10. Reached the Mythic login page in the browser, confirming the web UI was up and serving over HTTPS
+
+   ![Mythic login page](../screenshots/week-2/mythic_login.png)
+
+**Problems hit:**
+- `docker.service` repeatedly failed with `Start request repeated too quickly` — root cause buried under systemd's generic wrapper messages, required `journalctl -xeu docker.service` to surface the actual `no sockets found via socket activation` error
+- Mythic's web UI, RabbitMQ, and server ports were all bound to `127.0.0.1` by default (`mythic_server_bind_localhost_only` / `rabbitmq_bind_localhost_only` both true out of the box), meaning nothing outside the Mythic host itself — not even the allowlisted trusted IP — could reach them yet
+- Uncertain which port the web UI actually landed on — saw `17443` in this environment rather than Mythic's documented default of `7443`
+
+**How I solved them:**
+- Diagnosed the Docker startup failure via `journalctl -xeu docker.service --no-pager -n 100` instead of relying on the truncated systemd status output
+- Planned fix for the localhost-binding issue (carries into Day 10):
+  ```bash
+  sudo ./mythic-cli config set mythic_server_bind_localhost_only false
+  sudo ./mythic-cli config set rabbitmq_bind_localhost_only false
+  sudo ./mythic-cli restart
+  ```
+- Will re-verify the firewall rule against the correct port once Mythic is confirmed listening on `0.0.0.0`
+
+**Still open / next steps:**
+- Apply the `bind_localhost_only false` config changes and restart Mythic so it listens on all interfaces
+- Confirm the actual web UI port (`7443` vs `17443`) before finalizing the firewall allowlist rule
+- Test end-to-end reachability from Kali to the Mythic web UI once binding + firewall rule are both corrected
+
 ---
