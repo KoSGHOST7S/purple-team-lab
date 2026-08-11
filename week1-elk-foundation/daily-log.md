@@ -501,4 +501,51 @@ Fleet Server acts as the central management point between Elastic Agents and Ela
 - Confirm the actual web UI port (`7443` vs `17443`) before finalizing the firewall allowlist rule
 - Test end-to-end reachability from Kali to the Mythic web UI once binding + firewall rule are both corrected
 
----
+## Day 10
+
+**Goal for today:**
+- Set up Apollo agent and the HTTP C2 profile in Mythic, generate a payload, deliver it to the Windows target via RDP brute-force access, and confirm callback
+
+**What I did:**
+1. Reset the password on the Windows target machine so a brute-force login could be demonstrated against a known-good credential (password known in advance — this was a controlled demo of the brute-force path, not a blind attack)
+2. Installed the **Apollo** agent into Mythic, from the Mythic Ubuntu server:
+   ```bash
+   ./mythic-cli install github https://github.com/MythicAgents/Apollo.git
+   ```
+
+   ![Installing Apollo](../screenshots/week-3/installing_apollo.png)
+
+3. Installed the **HTTP** C2 profile into Mythic, same server:
+   ```bash
+   ./mythic-cli install github https://github.com/MythicC2Profiles/http
+   ```
+
+   ![Installed C2 profile](../screenshots/week-3/installedc2profile.png)
+
+4. Confirmed Apollo and the HTTP profile were both showing as available in the Mythic UI
+
+   ![Available agents](../screenshots/week-3/available_agents.png)
+
+5. Created a payload in Mythic using the Apollo agent + HTTP profile
+
+   ![Creating C2 payload for Windows](../screenshots/week-3/creatingc2payloadforiwn.png)
+
+   ![Payload name](../screenshots/week-3/payloadname.png)
+
+6. Moved the generated payload to the Mythic Ubuntu server and served it over a simple Python HTTP server so it could be pulled down from the Windows target
+7. From the Windows machine, performed the brute-force login (using the known/reset credential from step 1) to gain access
+
+   ![Brute-force POC into Windows](../screenshots/week-3/bruteforcePOC_into_win.png)
+
+8. Downloaded and ran the payload on the Windows machine, from the Python-hosted file on the Mythic server
+9. Received a callback in Mythic from the Windows host, confirming the Apollo agent checked in successfully
+10. Turned off Windows Defender manually via Windows Security settings on the target (not via an agent command)
+
+    ![Disabled Defender](../screenshots/week-3/disableddefender.png)
+
+11. Created a `passwords.txt` file to represent a set of downloaded/captured credentials for the exercise
+
+    ![Downloaded passwords via Mythic](../screenshots/week-3/downloadpasswords_mythic.png)
+
+Elastic stack to see what actually got detected
+- Document detection gaps: what would a blue team have seen at each step (RDP brute force → payload download → callback → Defender disabled) versus what was missed
