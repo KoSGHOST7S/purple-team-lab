@@ -549,3 +549,46 @@ Fleet Server acts as the central management point between Elastic Agents and Ela
 
 Elastic stack to see what actually got detected
 - Document detection gaps: what would a blue team have seen at each step (RDP brute force → payload download → callback → Defender disabled) versus what was missed
+## Day 11
+
+**Goal for today:**
+- Build a Kibana dashboard specifically for hunting/reviewing the Mythic/Apollo C2 activity from Day 10 — process creation, outbound network connections, and Defender status — to see what telemetry actually got captured across the attack chain (RDP brute force → payload download → callback → Defender disabled)
+
+**What I did:**
+1. Started in **Discover** to validate each query individually against the Windows/Sysmon data view before building any panels
+2. Confirmed the actual field names available for this data source (raw `winlog.event_data.*` rather than fully ECS-mapped fields, since this comes in through the Custom Windows Event Logs integration):
+
+   ![Mythic ELK fields](../screenshots/week-3/mythic_elkfields.png)
+
+3. Built and tested the **process creation** query (Sysmon Event ID 1), scoped to the binaries relevant to the C2 exercise and common LOLBin execution:
+   ```
+   event.code : "1" and event.provider : "Microsoft-Windows-Sysmon" and (winlog.event_data.Image : "*powershell.exe" or winlog.event_data.Image : "*cmd.exe" or winlog.event_data.Image : "*rundll32.exe")
+   ```
+   Confirmed this picked up the PowerShell process that preceded `svchost-mythic.exe` execution on `SOC-WIN-larry`
+4. Built and tested the **outbound network connections** query (Sysmon Event ID 3), to catch the Apollo agent's callback traffic to the Mythic C2 server:
+   ```
+   event.code : "3" and event.provider : "Microsoft-Windows-Sysmon" and winlog.event_data.Initiated : "true"
+   ```
+5. Built and tested the **Defender status** query (Event ID 5001 — real-time protection disabled), to correlate the manual Defender disablement from Day 10 with an actual logged event:
+   ```
+   event.code : "5001" and event.provider : "Microsoft-Windows-Windows Defender"
+   ```
+6. Pulled together the Apollo/C2 detection findings into a dedicated view:
+
+   ![Apollo C2 detection](../screenshots/week-3/ApolloC2detection.png)
+
+7. Created a new dashboard, **MySOC-Mythic-Activity**, combining the process-create, outbound-connection, and Defender panels into a single view for reviewing the full attack chain:
+
+   ![Mythic Activity Dashboard](../screenshots/week-3/MythicActivity%20Dashboard.png)
+
+8. Set the dashboard's global time range to cover the Day 10 exercise window so all panels line up chronologically
+9. Walked the panels in timestamp order to reconstruct the attack chain end-to-end in the telemetry: RDP brute-force success → `powershell.exe` spawning `svchost-mythic.exe` from `C:\Users\Public\Downloads\` → outbound connection from the payload to the Mythic server → Defender 5001 event around the time real-time protection was manually disabled
+
+**Problems hit:**
+- Initial process-create query returned zero results — was querying `process.name` (ECS field) instead of `winlog.event_data.Image`, since this data source isn't fully ECS-mapped
+- Outbound connection panel initially showed noise from legitimate background traffic alongside the actual callback — needed to isolate by destination IP
+- Had to double check field names via Discover (see `mythic_elkfields.png`) before trusting any panel results, since assuming ECS field names silently returned empty panels instead of erroring
+
+**How I solved them:**
+- Swapped ECS-style field references for the correct raw `winlog.event_data.*` field names to match this integration's actual ingest format
+- Added an explicit destination IP filter to cut the outbound connections panel down to just the relevant callback traffic
