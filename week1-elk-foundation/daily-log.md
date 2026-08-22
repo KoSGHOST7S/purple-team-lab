@@ -655,3 +655,54 @@ Elastic stack to see what actually got detected
 - Confirm ticket submission and staff-side workflows work end-to-end through the deployed URL
 - Decide whether this Windows/XAMPP/osTicket host should be enrolled into Fleet like the other Windows endpoints, so web server/access logs feed into the Elastic stack
 - Part 2 (next steps for osTicket) to follow
+## Day 13
+
+**Goal for today:**
+- Integrate osTicket with the Elastic stack so that when an alert rule fires, it automatically opens a ticket instead of just showing up as an alert in Kibana
+
+**What I did:**
+1. In osTicket, went to **Manage > API** and added a new API key scoped to **Can Create Tickets (XML/JSON/EMAIL)**, restricted to the Elastic host's IP address, with an internal note (`MySOC Elastic Connector`) to keep track of its purpose.
+
+   ![Create osTicket to Elastic API key](../screenshots/week-4/ostickettoelk/create_ostickettoelasticapikey.png)
+
+2. Confirmed the Basic (free) Kibana license doesn't include the Webhook connector action needed to call osTicket's API from an alert rule, so started a 30-day trial to unlock the Connectors feature under **Stack Management > License Management**.
+
+   ![Start 30 day trial](../screenshots/week-4/ostickettoelk/start30daytrial.png)
+
+3. Configured a new **Webhook** connector in Kibana pointing at the osTicket API endpoint, using the API key generated in step 1 for authentication, and attached it as an action on the existing alert rule(s) so a ticket gets created whenever the rule fires.
+4. Ran the connector's built-in test to confirm it could actually reach osTicket. It failed:
+```
+   error calling webhook, request failed
+   [ECONNABORTED] timeout of 60000ms exceeded
+```
+
+   ![Request error](../screenshots/week-4/ostickettoelk/requesterror.png)
+
+5. Investigated the timeout by checking the Windows osTicket server's network config with `ipconfig /all`, and found the active adapter had been assigned an APIPA address (`169.254.181.203`) instead of a real routable IP, meaning the host wasn't actually reachable from Elastic at the address the webhook was configured to hit.
+
+   ![APIPA address found](../screenshots/week-4/ostickettoelk/apipa.png)
+
+6. Fixed the networking on the osTicket/XAMPP host by making sure it was actually using both its public IP and its VPC IP correctly, so it could properly route to and from the Elastic stack instead of falling back to an APIPA address.
+7. Verified the fix by going to the Elastic (ELK) machine and pinging the osTicket host's address directly, confirming it was now reachable before re-testing the webhook.
+8. Re-ran the webhook test, which succeeded this time and reached osTicket cleanly.
+9. Re-triggered the alert condition to confirm the full chain worked end to end: alert fires in Kibana, webhook calls osTicket's API, and a new ticket is created automatically, alongside the existing manually created test tickets.
+
+   ![Integrated tickets for ELK](../screenshots/week-4/ostickettoelk/integratedticketsforelk.png)
+
+**Problems hit:**
+- Kibana's Basic license doesn't include Webhook connectors, so the 30-day trial was needed to even build this integration
+- Webhook connector test initially failed with a 60 second timeout (`ECONNABORTED`), with no indication in the error itself of why osTicket wasn't responding
+- Root cause was on the osTicket/XAMPP host's side: its network adapter had fallen back to an APIPA (`169.254.x.x`) self-assigned address rather than a real IP, so it was effectively unreachable from Elastic regardless of the webhook config being correct
+
+**How I solved them:**
+- Created a scoped API key in osTicket before touching the Kibana side, so the connector had valid credentials to authenticate with
+- Started the Kibana 30-day trial to unlock Connectors/Webhook actions
+- Diagnosed the timeout by checking network config directly on the osTicket host with `ipconfig /all`, which revealed the APIPA address rather than assuming the webhook config itself was wrong
+- Resolved the APIPA issue by ensuring the osTicket host was properly using its public IP and its VPC IP, so both could route correctly
+- Confirmed connectivity from the ELK machine's side with a ping test against the osTicket host before re-testing and re-firing the alert to confirm tickets were created successfully
+
+**Still open / next steps:**
+- Decide on a longer term licensing plan once the 30-day trial expires, since Webhook connectors are a subscription feature
+- Add connectors/actions to the remaining alert rules (RDP brute-force, Mythic/C2 detections) so all alert types generate tickets, not just the one tested today
+- Consider adding more context (source IP, rule name, timestamp) into the ticket body/subject template so tickets are actionable without needing to pivot back into Kibana
+- Look into whether the osTicket host's APIPA issue could recur (static IP vs DHCP) and consider setting a static IP to prevent it from happening again
