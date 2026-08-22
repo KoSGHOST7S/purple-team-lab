@@ -592,3 +592,66 @@ Elastic stack to see what actually got detected
 **How I solved them:**
 - Swapped ECS-style field references for the correct raw `winlog.event_data.*` field names to match this integration's actual ingest format
 - Added an explicit destination IP filter to cut the outbound connections panel down to just the relevant callback traffic
+## Day 12
+
+**Goal for today:**
+- Stand up osTicket on a dedicated Windows Server host using XAMPP as the web/DB stack, to bring a support-ticketing system into the SOC environment
+
+**What I did:**
+1. Downloaded the XAMPP installer (8.2.12 stack) from the official Apache Friends site:
+   https://www.apachefriends.org/download.html
+
+   Ran the installer on the Windows server, walking through the setup wizard to install Apache, MySQL, and PHP.
+
+   ![XAMPP install](../screenshots/week-4/addingosticket/install_xampp.png)
+
+2. In the XAMPP Control Panel, edited the Apache config's properties file, changing `apache_domainname` from the default `localhost` to the server's actual IP (`64.177.15.247`), so osTicket would be reachable at the machine's real address rather than just loopback.
+
+   ![Edited XAMPP domain name to main IP](../screenshots/week-4/addingosticket/editxamppfromlocaltothemainipofmachine.png)
+
+3. Added inbound Windows Firewall rules allowing TCP `80` and `443`, so remote HTTP/HTTPS traffic could actually reach the XAMPP-hosted site.
+
+   ![Created inbound rules for 80 and 443](../screenshots/week-4/addingosticket/createdinbound80%20and%20443.png)
+
+4. Extracted osTicket v1.18.4 into the XAMPP htdocs directory, then created a dedicated database (`mysoc-db`) in phpMyAdmin and reviewed/confirmed the `root` DB user's privileges against it.
+
+   ![Made DB for osTicket](../screenshots/week-4/addingosticket/makedbforosticket.png)
+
+5. Browsed to the osTicket setup path — the installer's welcome page confirmed prerequisites were met (PHP 8.2.12 detected, MySQLi extension loaded).
+
+   ![osTicket setup page](../screenshots/week-4/addingosticket/osticketsetuppage.png)
+
+6. Hit a **"Configuration file missing!"** error — osTicket only ships a template (`include/ost-sampleconfig.php`) and expects `include/ost-config.php` to exist before setup can proceed.
+
+   ![Config file missing](../screenshots/week-4/addingosticket/sayconfigfileismissing.png)
+
+7. Resolved it per the installer's own guidance (Windows PowerShell: `Copy-Item -Path include\ost-sampleconfig.php -Destination include\ost-config.php`), then continued.
+8. Reached the account setup page and filled in the admin account (name, email, username `MySOC`, password) and database settings (table prefix `ost_`, host `localhost`, database `MySOC-DB`, username `root`, password).
+
+   ![osTicket account setup](../screenshots/week-4/addingosticket/osticketaccountsetup.png)
+
+9. Clicked **Install Now** — got the **"Congratulations!"** page confirming osTicket v1.18.4 installed successfully, with the live URL (`http://64.177.15.247/osticket/upload/`) and staff control panel link.
+
+   ![Congrats, osTicket installed](../screenshots/week-4/addingosticket/congratsweinstalledosticket.png)
+
+10. Per the installer's post-install cleanup instructions, locked down write access to `include/ost-config.php` from an elevated PowerShell using the Windows equivalent of `chmod`:
+```powershell
+    icacls .\ost-config.php /reset
+```
+   Confirmed with `Successfully processed 1 files; Failed processing 0 files`.
+
+   ![Locked down write access](../screenshots/week-4/addingosticket/lockdownwriteaccess.png)
+
+**Problems hit:**
+- Setup page initially failed with "Configuration file missing!" since `ost-config.php` didn't exist yet — only the sample template did
+- osTicket's post-install guidance gives different commands per platform (CLI `chmod`, PowerShell `icacls`, FTP, cPanel) — had to use the Windows-specific `icacls` syntax since this is a Windows Server host, not Linux
+
+**How I solved them:**
+- Followed osTicket's own remediation step from the "Configuration file missing" page to create `ost-config.php` from the sample
+- Ran `icacls .\ost-config.php /reset` post-install to strip any leftover write permissions the installer needed during setup
+
+**Still open / next steps:**
+- Log into the Admin Panel with the created credentials and complete remaining post-install configuration
+- Confirm ticket submission and staff-side workflows work end-to-end through the deployed URL
+- Decide whether this Windows/XAMPP/osTicket host should be enrolled into Fleet like the other Windows endpoints, so web server/access logs feed into the Elastic stack
+- Part 2 (next steps for osTicket) to follow
